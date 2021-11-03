@@ -6,11 +6,97 @@ BIGQUERY_TABLE = "$BIGQUERY_TABLE"
 
 # Add/Update the queries for your metrics
 MQL_QUERYS = {
-"instance/cpu/utilization":
+#"instance/cpu/utilization":
+#"""
+#fetch gce_instance::compute.googleapis.com/instance/cpu/utilization
+#| bottom 3, max(val()) | within 5m
+#""",
+"instance/gkecluster/bytecount":
 """
-fetch gce_instance::compute.googleapis.com/instance/cpu/utilization
-| bottom 3, max(val()) | within 5m
+fetch k8s_cluster
+| metric 'logging.googleapis.com/byte_count'
+| align rate(1h)
+| every 1h
 """,
+"instance/gkecluster/logentrycount":
+"""
+fetch k8s_cluster
+| metric 'logging.googleapis.com/log_entry_count'
+| align rate(1h)
+| every 1h
+""",
+"instance/dataflow/logentrycount":
+"""
+fetch dataflow_job
+| metric 'logging.googleapis.com/log_entry_count'
+| align rate(96h)
+| every 96h
+""",
+"instance/dataflow/bytecount":
+"""
+fetch dataflow_job
+| metric 'logging.googleapis.com/byte_count'
+| align rate(96h)
+| every 96h
+""",
+"instance/bigtable/requestcount":
+"""
+fetch bigtable_table
+| metric 'bigtable.googleapis.com/server/request_count'
+| align rate(5h)
+| every 5h
+""",
+"instance/bigtable/bytescount":
+"""
+fetch bigtable_table
+| metric 'bigtable.googleapis.com/table/bytes_used'
+| group_by 5m, [value_bytes_used_mean: mean(value.bytes_used)]
+| every 5m
+""",
+"instance/bigtable/storageutilization":
+"""
+fetch bigtable_cluster
+| metric 'bigtable.googleapis.com/cluster/storage_utilization'
+| group_by 1h, [value_storage_utilization_mean: mean(value.storage_utilization)]
+| every 1h
+""",
+"instance/bigtable/pernodestoragecapacity":
+"""
+fetch bigtable_cluster
+| metric 'bigtable.googleapis.com/disk/per_node_storage_capacity'
+| group_by 1h,
+    [value_per_node_storage_capacity_mean:
+       mean(value.per_node_storage_capacity)]
+| every 1h
+""",
+"instance/bigtable/bytesused":
+"""
+fetch bigtable_cluster
+| metric 'bigtable.googleapis.com/disk/bytes_used'
+| group_by 1h, [value_bytes_used_mean: mean(value.bytes_used)]
+| every 1h
+""",
+"instance/bigtable/storagecapacity":
+"""
+fetch bigtable_cluster
+| metric 'bigtable.googleapis.com/disk/storage_capacity'
+| group_by 1h, [value_storage_capacity_mean: mean(value.storage_capacity)]
+| every 1h
+""",
+"instance/kubernetes/nodesbytecount":
+"""
+fetch k8s_node
+| metric 'logging.googleapis.com/byte_count'
+| align rate(5h)
+| every 5h
+""",
+"instance/kubernetes/nodelogentrycount":
+"""
+fetch k8s_node
+| metric 'logging.googleapis.com/log_entry_count'
+| align rate(5h)
+| every 5h
+"""
 
 # "bigquery/slots/total_available":
 # """
