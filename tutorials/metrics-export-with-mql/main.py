@@ -206,25 +206,40 @@ def build_distribution_value(value_json):
     return distribution_value
 
 
-def write_to_bigquery(rows_to_insert):
+def write_to_bigquery(rows_to_insert,metric):
     """ Write rows to the BigQuery stats table using the BigQuer client
     """
     logging.debug("write_to_bigquery")
     client = bigquery.Client()
-
-    table_id = f'{config.PROJECT_ID}.{config.BIGQUERY_DATASET}.{config.BIGQUERY_TABLE}'
+    if('gkecluster' in metric):
+        table_id = f'{config.PROJECT_ID}.{config.BIGQUERY_DATASET}.{config.BIGQUERY_CLUSTER_TABLE}'
+    elif('kubernetes' in metric):
+        table_id = f'{config.PROJECT_ID}.{config.BIGQUERY_DATASET}.{config.BIGQUERY_KUBERNETES_TABLE}'
+    elif('bigtable' in metric):
+        table_id = f'{config.PROJECT_ID}.{config.BIGQUERY_DATASET}.{config.BIGQUERY_BIGTABLE_TABLE}'
+    else:
+        table_id = f'{config.PROJECT_ID}.{config.BIGQUERY_DATASET}.{config.BIGQUERY_DATAFLOW_TABLE}'
     errors = client.insert_rows_json(table_id, rows_to_insert)
     if errors == []:
         print("New rows have been added.")
     else:
         print("Encountered errors while inserting rows: {}".format(errors))
 
+    # table_id1 = f'{config.PROJECT_ID}.{config.BIGQUERY_DATASET}.{config.BIGQUERY_TABLE1}'
+    # errors1 = client.insert_rows_json(table_id1, rows_to_insert)
+    # if errors1 == []:
+    #     print("New rows have been added.")
+    # else:
+    #     print("Encountered errors while inserting rows: {}".format(errors1))
+
 def save_to_bq(token):
     for metric, query in config.MQL_QUERYS.items():
         result = get_mql_result(token, query)
+		# print("Token : " +token)
+        print("Query : " +query)
         if result.get("timeSeriesDescriptor"):
             row = build_rows(metric, result)
-            write_to_bigquery(row)
+            write_to_bigquery(row,metric)
         else:
             print("No data retrieved")
 
