@@ -29,29 +29,29 @@ fetch k8s_cluster
 """
 fetch dataflow_job
 | metric 'logging.googleapis.com/log_entry_count'
-| align rate(96h)
-| every 96h
+| align rate(1h)
+| every 1h
 """,
 "instance/dataflow/bytecount":
 """
 fetch dataflow_job
 | metric 'logging.googleapis.com/byte_count'
-| align rate(96h)
-| every 96h
+| align rate(1h)
+| every 1h
 """,
 "instance/bigtable/requestcount":
 """
 fetch bigtable_table
 | metric 'bigtable.googleapis.com/server/request_count'
-| align rate(5h)
-| every 5h
+| align rate(1h)
+| every 1h
 """,
 "instance/bigtable/bytescount":
 """
 fetch bigtable_table
 | metric 'bigtable.googleapis.com/table/bytes_used'
-| group_by 5m, [value_bytes_used_mean: mean(value.bytes_used)]
-| every 5m
+| group_by 1h, [value_bytes_used_mean: mean(value.bytes_used)]
+| every 1h
 """,
 "instance/bigtable/storageutilization":
 """
@@ -87,15 +87,15 @@ fetch bigtable_cluster
 """
 fetch k8s_node
 | metric 'logging.googleapis.com/byte_count'
-| align rate(5h)
-| every 5h
+| align rate(1h)
+| every 1h
 """,
 "instance/kubernetes/nodelogentrycount":
 """
 fetch k8s_node
 | metric 'logging.googleapis.com/log_entry_count'
-| align rate(5h)
-| every 5h
+| align rate(1h)
+| every 1h
 """
 
 # "bigquery/slots/total_available":
